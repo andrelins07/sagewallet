@@ -24,6 +24,9 @@ public class LancamentoController {
     @Autowired
     private CategoriaRepository categoriaRepository;
 
+    @Autowired
+    private IndicadorWebSocketController webSocketController;
+
     @GetMapping
     public ResponseEntity<List<Lancamento>> getAll(){
         return ResponseEntity.ok(lancamentoRepository.findAll());
@@ -45,10 +48,15 @@ public class LancamentoController {
     @PostMapping
     public ResponseEntity<Lancamento> postPostagem(@Valid @RequestBody Lancamento lancamento) {
 
-        if (categoriaRepository.existsById(lancamento.getCategoria().getId()))
-            return ResponseEntity.status(HttpStatus.CREATED).body(lancamentoRepository.save(lancamento));
+        Lancamento novoLancamento;
 
-        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Categoria não existe!", null);
+        if (!categoriaRepository.existsById(lancamento.getCategoria().getId()))
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Categoria não existe!", null);
+
+        Lancamento novo = lancamentoRepository.save(lancamento);
+        webSocketController.carregarIndicadores();
+
+        return ResponseEntity.ok(novo);
     }
 
     @PutMapping
