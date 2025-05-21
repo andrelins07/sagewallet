@@ -7,6 +7,7 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
 
 @Controller
 public class IndicadorWebSocketController {
@@ -20,9 +21,8 @@ public class IndicadorWebSocketController {
 
     @MessageMapping("/carregar-indicadores")
     @SendTo("/topics/indicadores")
-    public void carregarIndicadores() {
-        System.out.println("ENTREI");
-        Indicadores indicadores = indicadoresService.calcularIndicadores();
+    public void carregarIndicadores(Integer id) {
+        Indicadores indicadores = indicadoresService.calcularIndicadores(id);
         messagingTemplate.convertAndSend("/topics/indicadores", indicadores);
     }
 }

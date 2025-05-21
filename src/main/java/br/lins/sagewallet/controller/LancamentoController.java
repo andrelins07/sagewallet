@@ -54,7 +54,7 @@ public class LancamentoController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Categoria não existe!", null);
 
         Lancamento novo = lancamentoRepository.save(lancamento);
-        webSocketController.carregarIndicadores();
+        webSocketController.carregarIndicadores(lancamento.getUsuario().getId());
 
         return ResponseEntity.ok(novo);
     }
