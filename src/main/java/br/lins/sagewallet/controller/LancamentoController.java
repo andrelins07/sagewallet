@@ -1,5 +1,6 @@
 package br.lins.sagewallet.controller;
 
+import br.lins.sagewallet.model.Notificacao;
 import br.lins.sagewallet.model.lancamento.Lancamento;
 import br.lins.sagewallet.repository.CategoriaRepository;
 import br.lins.sagewallet.repository.LancamentoRepository;
@@ -25,7 +26,10 @@ public class LancamentoController {
     private CategoriaRepository categoriaRepository;
 
     @Autowired
-    private IndicadorWebSocketController webSocketController;
+    private IndicadorWebSocketController webSocketIndicadoresController;
+
+    @Autowired
+    private NotificacaoWebsocketController notificacaoWebsocketController;
 
     @GetMapping
     public ResponseEntity<List<Lancamento>> getAll(){
@@ -54,8 +58,8 @@ public class LancamentoController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Categoria não existe!", null);
 
         Lancamento novo = lancamentoRepository.save(lancamento);
-        webSocketController.carregarIndicadores(lancamento.getUsuario().getId());
-
+        webSocketIndicadoresController.carregarIndicadores(lancamento.getUsuario().getId());
+        notificacaoWebsocketController.criarNotificacao(new Notificacao(lancamento.getUsuario(), "Novo lancamento criado com sucesso!"));
         return ResponseEntity.ok(novo);
     }
 
