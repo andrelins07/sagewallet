@@ -1,8 +1,10 @@
 package br.lins.sagewallet.controller;
 
+import br.lins.sagewallet.model.Notificacao;
 import br.lins.sagewallet.model.lancamento.Lancamento;
 import br.lins.sagewallet.repository.CategoriaRepository;
 import br.lins.sagewallet.repository.LancamentoRepository;
+import br.lins.sagewallet.service.LancamentoService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -25,7 +27,13 @@ public class LancamentoController {
     private CategoriaRepository categoriaRepository;
 
     @Autowired
-    private IndicadorWebSocketController webSocketController;
+    private IndicadorWebSocketController webSocketIndicadoresController;
+
+    @Autowired
+    private NotificacaoWebsocketController notificacaoWebsocketController;
+
+    @Autowired
+    private LancamentoService lancamentoService;
 
     @GetMapping
     public ResponseEntity<List<Lancamento>> getAll(){
@@ -37,6 +45,11 @@ public class LancamentoController {
 
         return lancamentoRepository.findById(id).map(ResponseEntity::ok)
                 .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
+    }
+    @GetMapping("/usuario/{id}")
+    public ResponseEntity<List<Lancamento>> findLancamentoByUser(@PathVariable Integer id) {
+
+        return ResponseEntity.ok(lancamentoService.listarTodosLancamentos(id));
     }
 
     @GetMapping("/descricao/{descricao}")
@@ -54,8 +67,8 @@ public class LancamentoController {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Categoria não existe!", null);
 
         Lancamento novo = lancamentoRepository.save(lancamento);
-        webSocketController.carregarIndicadores(lancamento.getUsuario().getId());
-
+        webSocketIndicadoresController.carregarIndicadores(lancamento.getUsuario().getId());
+        notificacaoWebsocketController.criarNotificacao(new Notificacao(lancamento.getUsuario(), "Novo lancamento criado com sucesso!"));
         return ResponseEntity.ok(novo);
     }
 
