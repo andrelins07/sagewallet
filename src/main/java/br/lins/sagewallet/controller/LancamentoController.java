@@ -4,6 +4,7 @@ import br.lins.sagewallet.model.Notificacao;
 import br.lins.sagewallet.model.lancamento.Lancamento;
 import br.lins.sagewallet.repository.CategoriaRepository;
 import br.lins.sagewallet.repository.LancamentoRepository;
+import br.lins.sagewallet.service.LancamentoService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -31,6 +32,9 @@ public class LancamentoController {
     @Autowired
     private NotificacaoWebsocketController notificacaoWebsocketController;
 
+    @Autowired
+    private LancamentoService lancamentoService;
+
     @GetMapping
     public ResponseEntity<List<Lancamento>> getAll(){
         return ResponseEntity.ok(lancamentoRepository.findAll());
@@ -41,6 +45,11 @@ public class LancamentoController {
 
         return lancamentoRepository.findById(id).map(ResponseEntity::ok)
                 .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
+    }
+    @GetMapping("/usuario/{id}")
+    public ResponseEntity<List<Lancamento>> findLancamentoByUser(@PathVariable Integer id) {
+
+        return ResponseEntity.ok(lancamentoService.listarTodosLancamentos(id));
     }
 
     @GetMapping("/descricao/{descricao}")

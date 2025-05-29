@@ -1,7 +1,6 @@
 package br.lins.sagewallet.model.compartilhamento;
 
 import br.lins.sagewallet.model.Usuario;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import java.time.LocalDate;
