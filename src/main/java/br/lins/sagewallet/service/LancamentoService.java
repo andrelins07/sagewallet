@@ -1,5 +1,9 @@
 package br.lins.sagewallet.service;
 
+import br.lins.sagewallet.exception.CategoriaNaoEncontradaException;
+import br.lins.sagewallet.exception.LancamentoDuplicadoException;
+import br.lins.sagewallet.exception.LancamentoNaoEncontradoException;
+import br.lins.sagewallet.exception.UsuarioNaoEncontradoException;
 import br.lins.sagewallet.model.compartilhamento.Compartilhamento;
 import br.lins.sagewallet.model.compartilhamento.EstadoSolicitacao;
 import br.lins.sagewallet.model.lancamento.Lancamento;
@@ -8,11 +12,9 @@ import br.lins.sagewallet.repository.CategoriaRepository;
 import br.lins.sagewallet.repository.CompartilhamentoRepository;
 import br.lins.sagewallet.repository.LancamentoRepository;
 import br.lins.sagewallet.repository.UsuarioRepository;
-import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -54,18 +56,18 @@ public class LancamentoService {
                     .stream()
                     .map(Compartilhamento::getRemetente).toList());
             return lancamentoRepository.findByUsuarioIn(usuarios);
-        }).orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuario não encontrado!"));
+        }).orElseThrow(() -> new UsuarioNaoEncontradoException(id));
     }
 
     public Lancamento cadastrarLancamento(Lancamento lancamento) {
 
         if (lancamentoRepository.existsByDescricaoAndValorAndDataAndUsuario(
                 lancamento.getDescricao(), lancamento.getValor(), lancamento.getData(), lancamento.getUsuario())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Lançamento já cadastrado!");
+            throw new LancamentoDuplicadoException();
         }
 
         if (!categoriaRepository.existsById(lancamento.getCategoria().getId()))
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Categoria não encontrada!");
+            throw new CategoriaNaoEncontradaException();
 
         return lancamentoRepository.save(lancamento);
     }
@@ -77,10 +79,10 @@ public class LancamentoService {
 
         if (lancamentoRepository.existsByDescricaoAndValorAndDataAndUsuario(
                 lancamento.getDescricao(), lancamento.getValor(), lancamento.getData(), lancamento.getUsuario()))
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Lançamento já existente!");
+            throw new LancamentoDuplicadoException();
 
         if (!categoriaRepository.existsById(lancamento.getCategoria().getId()))
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Categoria não existe!");
+            throw new CategoriaNaoEncontradaException();
 
         return Optional.of(lancamentoRepository.save(lancamento));
     }
@@ -88,7 +90,7 @@ public class LancamentoService {
     public void deletarLancamento(Long id){
 
         if (!lancamentoRepository.existsById(id))
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
+            throw new LancamentoNaoEncontradoException();
 
         lancamentoRepository.deleteById(id);
     }
