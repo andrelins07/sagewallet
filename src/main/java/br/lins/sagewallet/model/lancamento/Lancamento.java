@@ -25,6 +25,7 @@ public class Lancamento {
     private BigDecimal valor;
 
     @ManyToOne
+    @JoinColumn(name = "categoria_id", nullable = false)
     private Categoria categoria;
 
     @Enumerated(EnumType.STRING)
@@ -33,6 +34,7 @@ public class Lancamento {
 
     @ManyToOne
     @NotNull
+    @JoinColumn(name = "usuario_id", nullable = false)
     private Usuario usuario;
 
     public Long getId() {
@@ -43,27 +45,27 @@ public class Lancamento {
         this.id = id;
     }
 
-    public @NotBlank String getDescricao() {
+    public String getDescricao() {
         return descricao;
     }
 
-    public void setDescricao(@NotBlank String descricao) {
+    public void setDescricao(String descricao) {
         this.descricao = descricao;
     }
 
-    public @NotNull LocalDate getData() {
+    public LocalDate getData() {
         return data;
     }
 
-    public void setData(@NotNull LocalDate data) {
+    public void setData(LocalDate data) {
         this.data = data;
     }
 
-    public @NotNull BigDecimal getValor() {
+    public BigDecimal getValor() {
         return valor;
     }
 
-    public void setValor(@NotNull BigDecimal valor) {
+    public void setValor(BigDecimal valor) {
         this.valor = valor;
     }
 
@@ -75,19 +77,19 @@ public class Lancamento {
         this.categoria = categoria;
     }
 
-    public @NotNull TipoLancamento getTipo() {
+    public TipoLancamento getTipo() {
         return tipo;
     }
 
-    public void setTipo(@NotNull TipoLancamento tipo) {
+    public void setTipo(TipoLancamento tipo) {
         this.tipo = tipo;
     }
 
-    public @NotNull Usuario getUsuario() {
+    public Usuario getUsuario() {
         return usuario;
     }
 
-    public void setUsuario(@NotNull Usuario usuario) {
+    public void setUsuario(Usuario usuario) {
         this.usuario = usuario;
     }
 }

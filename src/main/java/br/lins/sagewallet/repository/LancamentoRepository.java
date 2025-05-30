@@ -20,4 +20,8 @@ public interface LancamentoRepository extends JpaRepository<Lancamento, Long> {
 
     boolean existsByDescricaoAndValorAndDataAndUsuario(String descricao, BigDecimal valor, LocalDate data, Usuario usuario);
 
+    @Query("SELECT l FROM Lancamento l JOIN FETCH l.categoria JOIN FETCH l.usuario")
+    List<Lancamento> findAllWithCategoriaAndUsuario();
+
+
 }

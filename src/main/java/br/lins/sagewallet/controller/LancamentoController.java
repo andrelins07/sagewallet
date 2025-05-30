@@ -1,103 +1,80 @@
 package br.lins.sagewallet.controller;
 
-import br.lins.sagewallet.model.Notificacao;
 import br.lins.sagewallet.model.lancamento.Lancamento;
-import br.lins.sagewallet.repository.CategoriaRepository;
-import br.lins.sagewallet.repository.LancamentoRepository;
 import br.lins.sagewallet.service.LancamentoService;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 import java.util.List;
 import java.util.Optional;
-
 
 @RestController
 @RequestMapping("/lancamentos")
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 public class LancamentoController {
 
-    @Autowired
-    private LancamentoRepository lancamentoRepository;
+    private final IndicadorWebSocketController webSocketIndicadoresController;
+    private final LancamentoService lancamentoService;
 
-    @Autowired
-    private CategoriaRepository categoriaRepository;
-
-    @Autowired
-    private IndicadorWebSocketController webSocketIndicadoresController;
-
-    @Autowired
-    private NotificacaoWebsocketController notificacaoWebsocketController;
-
-    @Autowired
-    private LancamentoService lancamentoService;
+    public LancamentoController(
+            IndicadorWebSocketController webSocketIndicadoresController,
+            LancamentoService lancamentoService
+    ) {
+        this.webSocketIndicadoresController = webSocketIndicadoresController;
+        this.lancamentoService = lancamentoService;
+    }
 
     @GetMapping
     public ResponseEntity<List<Lancamento>> getAll(){
-        return ResponseEntity.ok(lancamentoRepository.findAll());
+        return ResponseEntity.ok(lancamentoService.listarTodos());
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<Lancamento> findLancamentoById(@PathVariable Long id) {
 
-        return lancamentoRepository.findById(id).map(ResponseEntity::ok)
+        return lancamentoService.listarPorId(id).map(ResponseEntity::ok)
                 .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
     }
     @GetMapping("/usuario/{id}")
     public ResponseEntity<List<Lancamento>> findLancamentoByUser(@PathVariable Integer id) {
 
-        return ResponseEntity.ok(lancamentoService.listarTodosLancamentos(id));
+        return ResponseEntity.ok(lancamentoService.listarPorUsuario(id));
     }
 
     @GetMapping("/descricao/{descricao}")
-    public ResponseEntity<List<Lancamento>> getCategoriaByNome(@PathVariable String descricao){
-        return ResponseEntity.ok(lancamentoRepository
-                .findAllByDescricaoContainingIgnoreCase(descricao));
+    public ResponseEntity<List<Lancamento>> buscarLancamentoPorDescricao(@PathVariable String descricao){
+        return ResponseEntity.ok(lancamentoService.listarPorDescricao(descricao));
     }
 
     @PostMapping
-    public ResponseEntity<Lancamento> postPostagem(@Valid @RequestBody Lancamento lancamento) {
+    public ResponseEntity<Lancamento> cadastrarLancamento(@Valid @RequestBody Lancamento lancamento) {
 
-        Lancamento novoLancamento;
+        Lancamento novo = lancamentoService.cadastrarLancamento(lancamento);
 
-        if (!categoriaRepository.existsById(lancamento.getCategoria().getId()))
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Categoria não existe!", null);
-
-        Lancamento novo = lancamentoRepository.save(lancamento);
         webSocketIndicadoresController.carregarIndicadores(lancamento.getUsuario().getId());
-        notificacaoWebsocketController.criarNotificacao(new Notificacao(lancamento.getUsuario(), "Novo lancamento criado com sucesso!"));
+
         return ResponseEntity.ok(novo);
     }
 
     @PutMapping
-    public ResponseEntity<Lancamento> putPostagem(@Valid @RequestBody Lancamento lancamento) {
+    public ResponseEntity<Lancamento> atualizarLancamento(@Valid @RequestBody Lancamento lancamento) {
 
-        if (lancamentoRepository.existsById(lancamento.getId())) {
+        Optional<Lancamento> lancamentoAtualizado = lancamentoService.atualizarLancamento(lancamento);
 
-            if (categoriaRepository.existsById(lancamento.getCategoria().getId())) {
-                return ResponseEntity.status(HttpStatus.OK).body(lancamentoRepository.save(lancamento));
-            }
-
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Categoria não existe!", null);
-        }
-
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
-
+        return lancamentoAtualizado
+                .map(l -> {
+                    webSocketIndicadoresController.carregarIndicadores(lancamento.getUsuario().getId());
+                    return ResponseEntity.ok(l);
+                })
+                .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
     }
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("/{id}")
-    public void deletePostagem(@PathVariable Long id) {
+    public void deletarLancamento(@PathVariable Long id) {
 
-        Optional<Lancamento> postagem = lancamentoRepository.findById(id);
+        lancamentoService.deletarLancamento(id);
 
-        if (postagem.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
-        }
-
-        lancamentoRepository.deleteById(id);
     }
 }

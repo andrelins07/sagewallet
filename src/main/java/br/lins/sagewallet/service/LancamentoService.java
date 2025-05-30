@@ -8,6 +8,7 @@ import br.lins.sagewallet.repository.CategoriaRepository;
 import br.lins.sagewallet.repository.CompartilhamentoRepository;
 import br.lins.sagewallet.repository.LancamentoRepository;
 import br.lins.sagewallet.repository.UsuarioRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -31,7 +32,19 @@ public class LancamentoService {
     @Autowired
     private CompartilhamentoRepository compartilhamentoPerfilRepository;
 
-    public List<Lancamento> listarTodosLancamentos(Integer id) {
+    public List<Lancamento> listarTodos() {
+        return lancamentoRepository.findAllWithCategoriaAndUsuario();
+    }
+    public Optional<Lancamento> listarPorId(Long id){
+        return lancamentoRepository.findById(id);
+    }
+
+    public List<Lancamento> listarPorDescricao(String descricao){
+        return lancamentoRepository
+                .findAllByDescricaoContainingIgnoreCase(descricao);
+    }
+
+    public List<Lancamento> listarPorUsuario(Integer id) {
 
         return usuarioRepository.findById(id).map(usuario -> {
             List<Usuario> usuarios = new ArrayList<>();
@@ -64,7 +77,7 @@ public class LancamentoService {
 
         if (lancamentoRepository.existsByDescricaoAndValorAndDataAndUsuario(
                 lancamento.getDescricao(), lancamento.getValor(), lancamento.getData(), lancamento.getUsuario()))
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Lançamento já cadastrado!");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Lançamento já existente!");
 
         if (!categoriaRepository.existsById(lancamento.getCategoria().getId()))
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Categoria não existe!");
