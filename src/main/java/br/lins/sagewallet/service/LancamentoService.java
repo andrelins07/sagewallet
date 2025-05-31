@@ -13,7 +13,6 @@ import br.lins.sagewallet.repository.CompartilhamentoRepository;
 import br.lins.sagewallet.repository.LancamentoRepository;
 import br.lins.sagewallet.repository.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
@@ -64,6 +63,10 @@ public class LancamentoService {
         if (lancamentoRepository.existsByDescricaoAndValorAndDataAndUsuario(
                 lancamento.getDescricao(), lancamento.getValor(), lancamento.getData(), lancamento.getUsuario())) {
             throw new LancamentoDuplicadoException();
+        }
+
+        if(usuarioRepository.findById(lancamento.getUsuario().getId()).isEmpty()){
+            throw new UsuarioNaoEncontradoException(lancamento.getUsuario().getId());
         }
 
         if (!categoriaRepository.existsById(lancamento.getCategoria().getId()))
