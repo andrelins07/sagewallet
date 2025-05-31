@@ -1,11 +1,9 @@
 package br.lins.sagewallet.model;
 
-import br.lins.sagewallet.model.lancamento.Lancamento;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.PositiveOrZero;
 import java.math.BigDecimal;
-import java.util.List;
 
 @Entity
 @Table(name = "tb_usuarios")
@@ -19,15 +17,21 @@ public class Usuario {
     private String nome;
 
     @NotBlank
+    @Column(unique = true)
+    private String nomeUsuario;
+
+    @NotBlank
+    @Column(unique = true)
     private String email;
 
+    @PositiveOrZero
     private BigDecimal salario;
 
+    @NotBlank
     private String ocupacao;
 
-    @OneToMany(mappedBy = "usuario", fetch = FetchType.LAZY, cascade = CascadeType.ALL)
-    @JsonIgnore
-    private List<Lancamento> lancamentos;
+    public Usuario() {
+    }
 
     public Integer getId() {
         return id;
@@ -43,6 +47,14 @@ public class Usuario {
 
     public void setNome(String nome) {
         this.nome = nome;
+    }
+
+    public String getNomeUsuario() {
+        return nomeUsuario;
+    }
+
+    public void setNomeUsuario(String nomeUsuario) {
+        this.nomeUsuario = nomeUsuario;
     }
 
     public String getEmail() {
@@ -67,23 +79,5 @@ public class Usuario {
 
     public void setOcupacao(String ocupacao) {
         this.ocupacao = ocupacao;
-    }
-
-    public List<Lancamento> getLancamentos() {
-        return lancamentos;
-    }
-
-    public void setLancamentos(List<Lancamento> lancamentos) {
-        this.lancamentos = lancamentos;
-    }
-
-    @Override
-    public String toString() {
-        return "Usuario{" +
-                "id=" + id +
-                ", nome='" + nome + '\'' +
-                ", salario=" + salario +
-                ", ocupacao='" + ocupacao + '\'' +
-                '}';
     }
 }
