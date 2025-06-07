@@ -10,35 +10,14 @@ import java.time.LocalDateTime;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    @ExceptionHandler(UsuarioNaoEncontradoException.class)
-    public ResponseEntity<ErrorResponse> handleUsuarioNaoEncontrado(UsuarioNaoEncontradoException ex) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse(ex.getMessage(), LocalDateTime.now(), 404));
-    }
-
-    @ExceptionHandler(LancamentoDuplicadoException.class)
-    public ResponseEntity<ErrorResponse> handleLancamentoDuplicado(LancamentoDuplicadoException ex) {
+    @ExceptionHandler(InformacoesDuplicadasException.class)
+    public ResponseEntity<ErrorResponse> handleInformacoesDuplicadas(InformacoesDuplicadasException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse(ex.getMessage(), LocalDateTime.now(), 400));
     }
 
-    @ExceptionHandler(LancamentoNaoEncontradoException.class)
-    public ResponseEntity<ErrorResponse> handleLancamentoNaoEncontrado(LancamentoNaoEncontradoException ex) {
+    @ExceptionHandler(ObjetoNaoEncontradoException.class)
+    public ResponseEntity<ErrorResponse> handleObjetoNaoEncontrado(ObjetoNaoEncontradoException ex) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse(ex.getMessage(), LocalDateTime.now(), 404));
-    }
-
-    @ExceptionHandler(CategoriaNaoEncontradaException.class)
-    public ResponseEntity<ErrorResponse> handleCategoriaNaoEncontrada(CategoriaNaoEncontradaException ex) {
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse(ex.getMessage(), LocalDateTime.now(), 404));
-    }
-
-
-    @ExceptionHandler(EmailJaExistenteException.class)
-    public ResponseEntity<ErrorResponse> handleNomeDeEmailJaCadastrado(EmailJaExistenteException ex) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse(ex.getMessage(), LocalDateTime.now(), 400));
-    }
-
-    @ExceptionHandler(NomeDeUsuarioJaExistenteException.class)
-    public ResponseEntity<ErrorResponse> handleNomeDeUsuarioJaCadastrado(NomeDeUsuarioJaExistenteException ex) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(new ErrorResponse(ex.getMessage(), LocalDateTime.now(), 400));
     }
 
     @ExceptionHandler(DadosInconsistentesException.class)

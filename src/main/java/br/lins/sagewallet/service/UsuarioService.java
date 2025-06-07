@@ -3,9 +3,8 @@ package br.lins.sagewallet.service;
 import java.util.List;
 import java.util.Optional;
 import br.lins.sagewallet.exception.DadosInconsistentesException;
-import br.lins.sagewallet.exception.EmailJaExistenteException;
-import br.lins.sagewallet.exception.NomeDeUsuarioJaExistenteException;
-import br.lins.sagewallet.exception.UsuarioNaoEncontradoException;
+import br.lins.sagewallet.exception.InformacoesDuplicadasException;
+import br.lins.sagewallet.exception.ObjetoNaoEncontradoException;
 import org.springframework.stereotype.Service;
 import br.lins.sagewallet.model.Usuario;
 import br.lins.sagewallet.repository.UsuarioRepository;
@@ -28,7 +27,7 @@ public class UsuarioService {
         Optional<Usuario> usuario = usuarioRepository.findById(id);
 
         if(usuario.isEmpty()){
-            throw new UsuarioNaoEncontradoException(id);
+            throw new ObjetoNaoEncontradoException("Usuario de id " + id + " não encontrado!");
         }
 
         return usuario.get();
@@ -47,7 +46,7 @@ public class UsuarioService {
             throw new DadosInconsistentesException("ID do corpo e da URL não coincidem");
 
         if (usuarioRepository.findById(id).isEmpty())
-            throw new UsuarioNaoEncontradoException(id);
+            throw new ObjetoNaoEncontradoException("Usuario de id " + id + " não encontrado!");
 
         validarUsuarioUnico(usuario);
 
@@ -58,19 +57,19 @@ public class UsuarioService {
     public void deletarUsuario(Integer id){
 
         if (usuarioRepository.findById(id).isEmpty()) {
-            throw new UsuarioNaoEncontradoException(id);
+            throw new ObjetoNaoEncontradoException("Usuario de id " + id + " não encontrado!");
         }
         usuarioRepository.deleteById(id);
     }
     private void validarUsuarioUnico(Usuario usuario) {
         Optional<Usuario> existentePorEmail = usuarioRepository.findByEmail(usuario.getEmail());
         if (existentePorEmail.isPresent() && !existentePorEmail.get().getId().equals(usuario.getId())) {
-            throw new EmailJaExistenteException();
+            throw new InformacoesDuplicadasException("Email ja existente no sistema!");
         }
 
         Optional<Usuario> existentePorNomeUsuario = usuarioRepository.findByNomeUsuario(usuario.getNomeUsuario());
         if (existentePorNomeUsuario.isPresent() && !existentePorNomeUsuario.get().getId().equals(usuario.getId())) {
-            throw new NomeDeUsuarioJaExistenteException();
+            throw new InformacoesDuplicadasException("Nome de usuario ja existente no sistema!");
         }
     }
 }
