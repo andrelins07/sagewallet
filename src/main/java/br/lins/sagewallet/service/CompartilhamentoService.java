@@ -1,66 +1,85 @@
 package br.lins.sagewallet.service;
 
 import br.lins.sagewallet.controller.NotificacaoWebsocketController;
+import br.lins.sagewallet.exception.ObjetoNaoEncontradoException;
 import br.lins.sagewallet.model.compartilhamento.Compartilhamento;
 import br.lins.sagewallet.model.Notificacao;
 import br.lins.sagewallet.model.Usuario;
+import br.lins.sagewallet.model.compartilhamento.EstadoSolicitacao;
 import br.lins.sagewallet.repository.CompartilhamentoRepository;
 import br.lins.sagewallet.repository.UsuarioRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
-import java.time.LocalDate;
+import java.util.List;
 import java.util.Optional;
 
 @Service
 public class CompartilhamentoService {
 
-    @Autowired
-    private UsuarioRepository usuarioRepository;
+    private final UsuarioRepository usuarioRepository;
 
-    @Autowired
-    private NotificacaoWebsocketController notificacaoWebsocketController;
+    private final NotificacaoWebsocketController notificacaoWebsocketController;
 
-    @Autowired
-    private CompartilhamentoRepository compartilhamentoRepository;
+    private final CompartilhamentoRepository compartilhamentoRepository;
+
+    public CompartilhamentoService(
+            UsuarioRepository usuarioRepository,
+            NotificacaoWebsocketController notificacaoWebsocketController,
+            CompartilhamentoRepository compartilhamentoRepository)
+    {
+        this.usuarioRepository = usuarioRepository;
+        this.notificacaoWebsocketController = notificacaoWebsocketController;
+        this.compartilhamentoRepository = compartilhamentoRepository;
+    }
+
+    public List<Compartilhamento> listarTodos(){
+        return compartilhamentoRepository.findAll();
+    }
+
+    public Compartilhamento listarPorId(Integer id){
+
+        return compartilhamentoRepository.findById(id).
+                orElseThrow(() -> new ObjetoNaoEncontradoException("Compartilhamento de ID " + id + " não foi localizado!"));
+    }
 
     public Compartilhamento novaSolicitacao(Compartilhamento compartilhamento) {
 
-        Optional<Usuario> usuario = usuarioRepository.findById(compartilhamento.getDestinatario().getId());
+        Usuario remetente = usuarioRepository.findById(compartilhamento.getRemetente().getId()).
+                orElseThrow(() -> new ObjetoNaoEncontradoException("Usuario remetente não foi encontrado!"));
 
-        if(usuario.isEmpty())
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "O usuario que deseja compartilhar não foi encontrado!");
+        Usuario destinatario = usuarioRepository.findById(compartilhamento.getDestinatario().getId()).
+                orElseThrow(() -> new ObjetoNaoEncontradoException("Usuario destinatario não foi encontrado!"));
 
         notificacaoWebsocketController.criarNotificacao(
                 new Notificacao(
-                        compartilhamento.getDestinatario(),
-                        compartilhamento.getRemetente().getNome() + " deseja compartilhar dados com você!"));
+                        destinatario,
+                        remetente.getNome() + " deseja compartilhar dados com você!"));
 
         return compartilhamentoRepository.save(compartilhamento);
-
     }
 
-    public Compartilhamento responderSolicitacao(Compartilhamento compartilhamento) {
+    public Compartilhamento responderSolicitacao(Integer id, EstadoSolicitacao resposta) {
 
-        if (!compartilhamentoRepository.existsById(compartilhamento.getId()))
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Solicitação de compartilhamento não encontrada!");
+        Compartilhamento compartilhamento = compartilhamentoRepository.findById(id)
+                .orElseThrow(() -> new ObjetoNaoEncontradoException("Solicitação de compartilhamento com id " + id + "não encontrada!"));
 
-        String mensagem;
+        compartilhamento.responderSolicitacao(resposta);
 
-        switch (compartilhamento.getStatus()) {
-            case APROVADO -> {
-                mensagem = compartilhamento.getDestinatario().getNome() + " aceitou o compartilhamento!";
-                compartilhamento.setDataCompartilhamento(LocalDate.now());
-            }
-            case RECUSADO ->
-                    mensagem = compartilhamento.getDestinatario().getNome() + " recusou o compartilhamento!";
+        String mensagem = switch (resposta) {
+            case APROVADO -> compartilhamento.getDestinatario().getNome() + " aceitou o compartilhamento!";
+            case RECUSADO -> compartilhamento.getDestinatario().getNome() + " recusou o compartilhamento!";
             default -> mensagem = "Status invalido";
-
-        }
+        };
 
         notificacaoWebsocketController.criarNotificacao(new Notificacao(compartilhamento.getRemetente(), mensagem));
 
         return compartilhamentoRepository.save(compartilhamento);
+    }
+
+    public void desfazerCompartilhamento(Integer id) {
+
+        if (compartilhamentoRepository.findById(id).isEmpty()) {
+            throw new ObjetoNaoEncontradoException("Compartilhamento de ID " + id + "não localizado!");
+        }
+        compartilhamentoRepository.deleteById(id);
     }
 }

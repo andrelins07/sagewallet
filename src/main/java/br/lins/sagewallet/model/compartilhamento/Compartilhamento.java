@@ -26,12 +26,21 @@ public class Compartilhamento {
     private LocalDate dataCompartilhamento;
 
     @Enumerated(EnumType.STRING)
-    private EstadoSolicitacao status = EstadoSolicitacao.PENDENTE;
+    private EstadoSolicitacao status;
 
-    private LocalDate dataSolicitacao = LocalDate.now();
+    private LocalDate dataSolicitacao;
 
     public Compartilhamento() {
+        status = EstadoSolicitacao.PENDENTE;
+        dataSolicitacao = LocalDate.now();
+    }
 
+    public void responderSolicitacao(EstadoSolicitacao resposta) {
+        this.status = resposta;
+
+        if (resposta == EstadoSolicitacao.APROVADO){
+            this.dataSolicitacao = LocalDate.now();
+        }
     }
 
     public Integer getId() {
