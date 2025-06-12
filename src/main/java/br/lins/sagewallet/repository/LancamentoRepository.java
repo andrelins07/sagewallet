@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 public interface LancamentoRepository extends JpaRepository<Lancamento, Long> {
 
@@ -18,7 +19,7 @@ public interface LancamentoRepository extends JpaRepository<Lancamento, Long> {
     @Query("SELECT l FROM Lancamento l JOIN FETCH l.categoria WHERE l.usuario IN :usuarios")
     List<Lancamento> findByUsuarioIn(List<Usuario> usuarios);
 
-    boolean existsByDescricaoAndValorAndDataAndUsuario(String descricao, BigDecimal valor, LocalDate data, Usuario usuario);
+    Optional<Lancamento> findByDescricaoAndValorAndDataAndUsuario(String descricao, BigDecimal valor, LocalDate data, Usuario usuario);
 
     @Query("SELECT l FROM Lancamento l JOIN FETCH l.categoria JOIN FETCH l.usuario")
     List<Lancamento> findAllWithCategoriaAndUsuario();

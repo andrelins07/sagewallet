@@ -7,7 +7,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/lancamentos")
@@ -26,55 +25,48 @@ public class LancamentoController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Lancamento>> getAll(){
-        return ResponseEntity.ok(lancamentoService.listarTodos());
+    public ResponseEntity<List<Lancamento>> listar(){
+        return ResponseEntity.ok(lancamentoService.listar());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Lancamento> findLancamentoById(@PathVariable Long id) {
-
-        return lancamentoService.listarPorId(id).map(ResponseEntity::ok)
-                .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
+    public ResponseEntity<Lancamento> listarPorId(@PathVariable Long id) {
+        return ResponseEntity.ok(lancamentoService.listarPorId(id));
     }
-    @GetMapping("/usuario/{id}")
-    public ResponseEntity<List<Lancamento>> findLancamentoByUser(@PathVariable Integer id) {
 
+    @GetMapping("/usuario/{id}")
+    public ResponseEntity<List<Lancamento>> listarPorUsuario(@PathVariable Integer id) {
         return ResponseEntity.ok(lancamentoService.listarPorUsuario(id));
     }
 
     @GetMapping("/descricao/{descricao}")
-    public ResponseEntity<List<Lancamento>> buscarLancamentoPorDescricao(@PathVariable String descricao){
+    public ResponseEntity<List<Lancamento>> listarPorDescricao(@PathVariable String descricao){
         return ResponseEntity.ok(lancamentoService.listarPorDescricao(descricao));
     }
 
     @PostMapping
-    public ResponseEntity<Lancamento> cadastrarLancamento(@Valid @RequestBody Lancamento lancamento) {
+    public ResponseEntity<Lancamento> criar(@Valid @RequestBody Lancamento lancamento) {
 
-        Lancamento novo = lancamentoService.cadastrarLancamento(lancamento);
+        Lancamento novo = lancamentoService.criar(lancamento);
 
         webSocketIndicadoresController.carregarIndicadores(lancamento.getUsuario().getId());
 
         return ResponseEntity.ok(novo);
     }
 
-    @PutMapping
-    public ResponseEntity<Lancamento> atualizarLancamento(@Valid @RequestBody Lancamento lancamento) {
+    @PutMapping("/{id}")
+    public ResponseEntity<Lancamento> atualizar(@Valid @RequestBody Lancamento lancamento, @PathVariable Long id) {
 
-        Optional<Lancamento> lancamentoAtualizado = lancamentoService.atualizarLancamento(lancamento);
+        Lancamento lancamentoAtualizado = lancamentoService.atualizar(lancamento, id);
 
-        return lancamentoAtualizado
-                .map(l -> {
-                    webSocketIndicadoresController.carregarIndicadores(lancamento.getUsuario().getId());
-                    return ResponseEntity.ok(l);
-                })
-                .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
+        webSocketIndicadoresController.carregarIndicadores(lancamento.getUsuario().getId());
+
+        return ResponseEntity.ok(lancamentoAtualizado);
     }
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("/{id}")
-    public void deletarLancamento(@PathVariable Long id) {
-
-        lancamentoService.deletarLancamento(id);
-
+    public void deletar(@PathVariable Long id) {
+        lancamentoService.deletar(id);
     }
 }
