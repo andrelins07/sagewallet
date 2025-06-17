@@ -1,6 +1,6 @@
 package br.lins.sagewallet.repository;
 
-import br.lins.sagewallet.model.Usuario;
+import br.lins.sagewallet.model.usuario.Usuario;
 import br.lins.sagewallet.model.lancamento.Lancamento;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

@@ -1,7 +1,6 @@
-package br.lins.sagewallet.controller;
+package br.lins.sagewallet.controller.webscoket;
 
-import br.lins.sagewallet.model.Notificacao;
-import br.lins.sagewallet.model.Usuario;
+import br.lins.sagewallet.model.notificacao.Notificacao;
 import br.lins.sagewallet.service.NotificacaoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.messaging.handler.annotation.MessageMapping;

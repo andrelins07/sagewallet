@@ -1,5 +1,6 @@
-package br.lins.sagewallet.controller;
+package br.lins.sagewallet.controller.rest;
 
+import br.lins.sagewallet.controller.webscoket.IndicadorWebSocketController;
 import br.lins.sagewallet.model.lancamento.Lancamento;
 import br.lins.sagewallet.service.LancamentoService;
 import jakarta.validation.Valid;

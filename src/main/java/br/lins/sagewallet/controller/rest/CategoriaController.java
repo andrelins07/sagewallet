@@ -1,4 +1,4 @@
-package br.lins.sagewallet.controller;
+package br.lins.sagewallet.controller.rest;
 
 import br.lins.sagewallet.model.lancamento.Categoria;
 import br.lins.sagewallet.repository.CategoriaRepository;

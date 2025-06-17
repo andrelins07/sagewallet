@@ -1,10 +1,10 @@
-package br.lins.sagewallet.controller;
+package br.lins.sagewallet.controller.rest;
 
 import br.lins.sagewallet.service.UsuarioService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.RestController;
-import br.lins.sagewallet.model.Usuario;
+import br.lins.sagewallet.model.usuario.Usuario;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;

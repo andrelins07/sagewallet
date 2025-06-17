@@ -1,4 +1,4 @@
-package br.lins.sagewallet.exception;
+package br.lins.sagewallet.dto;
 
 import java.time.LocalDateTime;
 

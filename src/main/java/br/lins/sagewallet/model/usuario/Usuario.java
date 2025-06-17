@@ -1,4 +1,4 @@
-package br.lins.sagewallet.model;
+package br.lins.sagewallet.model.usuario;
 
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;

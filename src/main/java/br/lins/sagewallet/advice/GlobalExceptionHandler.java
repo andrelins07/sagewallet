@@ -1,5 +1,6 @@
-package br.lins.sagewallet.controller;
+package br.lins.sagewallet.advice;
 
+import br.lins.sagewallet.dto.ErrorResponse;
 import br.lins.sagewallet.exception.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

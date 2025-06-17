@@ -1,6 +1,6 @@
 package br.lins.sagewallet.repository;
 
-import br.lins.sagewallet.model.Notificacao;
+import br.lins.sagewallet.model.notificacao.Notificacao;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 

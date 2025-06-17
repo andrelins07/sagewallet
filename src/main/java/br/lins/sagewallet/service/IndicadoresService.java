@@ -1,7 +1,6 @@
 package br.lins.sagewallet.service;
 
-import br.lins.sagewallet.model.Indicadores;
-import br.lins.sagewallet.model.Usuario;
+import br.lins.sagewallet.model.indicadores.Indicadores;
 import br.lins.sagewallet.model.lancamento.Categoria;
 import br.lins.sagewallet.model.lancamento.Lancamento;
 import br.lins.sagewallet.model.lancamento.TipoLancamento;

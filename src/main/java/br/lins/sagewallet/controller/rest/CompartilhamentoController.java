@@ -1,4 +1,4 @@
-package br.lins.sagewallet.controller;
+package br.lins.sagewallet.controller.rest;
 
 import br.lins.sagewallet.model.compartilhamento.Compartilhamento;
 import br.lins.sagewallet.model.compartilhamento.EstadoSolicitacao;

@@ -6,7 +6,7 @@ import br.lins.sagewallet.exception.DadosInconsistentesException;
 import br.lins.sagewallet.exception.InformacoesDuplicadasException;
 import br.lins.sagewallet.exception.ObjetoNaoEncontradoException;
 import org.springframework.stereotype.Service;
-import br.lins.sagewallet.model.Usuario;
+import br.lins.sagewallet.model.usuario.Usuario;
 import br.lins.sagewallet.repository.UsuarioRepository;
 
 @Service

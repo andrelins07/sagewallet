@@ -1,4 +1,4 @@
-package br.lins.sagewallet.model;
+package br.lins.sagewallet.model.indicadores;
 
 import java.math.BigDecimal;
 import java.util.List;

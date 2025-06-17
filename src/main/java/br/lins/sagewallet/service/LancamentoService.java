@@ -6,7 +6,7 @@ import br.lins.sagewallet.exception.ObjetoNaoEncontradoException;
 import br.lins.sagewallet.model.compartilhamento.Compartilhamento;
 import br.lins.sagewallet.model.compartilhamento.EstadoSolicitacao;
 import br.lins.sagewallet.model.lancamento.Lancamento;
-import br.lins.sagewallet.model.Usuario;
+import br.lins.sagewallet.model.usuario.Usuario;
 import br.lins.sagewallet.repository.CategoriaRepository;
 import br.lins.sagewallet.repository.CompartilhamentoRepository;
 import br.lins.sagewallet.repository.LancamentoRepository;

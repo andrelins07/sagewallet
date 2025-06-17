@@ -1,5 +1,6 @@
-package br.lins.sagewallet.model;
+package br.lins.sagewallet.model.notificacao;
 
+import br.lins.sagewallet.model.usuario.Usuario;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
