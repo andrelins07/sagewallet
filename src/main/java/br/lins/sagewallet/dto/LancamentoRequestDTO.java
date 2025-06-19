@@ -1,6 +1,5 @@
 package br.lins.sagewallet.dto;
 
-import br.lins.sagewallet.model.lancamento.Categoria;
 import br.lins.sagewallet.model.lancamento.TipoLancamento;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;

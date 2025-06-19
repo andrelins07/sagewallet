@@ -1,7 +1,6 @@
 package br.lins.sagewallet.service;
 
 import br.lins.sagewallet.dto.LancamentoRequestDTO;
-import br.lins.sagewallet.exception.DadosInconsistentesException;
 import br.lins.sagewallet.exception.InformacoesDuplicadasException;
 import br.lins.sagewallet.exception.ObjetoNaoEncontradoException;
 import br.lins.sagewallet.model.compartilhamento.Compartilhamento;
@@ -14,7 +13,6 @@ import br.lins.sagewallet.repository.CompartilhamentoRepository;
 import br.lins.sagewallet.repository.LancamentoRepository;
 import br.lins.sagewallet.repository.UsuarioRepository;
 import org.springframework.stereotype.Service;
-
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -77,17 +75,23 @@ public class LancamentoService {
         return lancamentoRepository.save(new Lancamento(lancamento, usuario, categoria));
     }
 
-    public Lancamento atualizar(Lancamento lancamento, Long id) {
+    public Lancamento atualizar(LancamentoRequestDTO lancamentoAtualizado, Long idLancamento) {
 
-        if(!lancamento.getId().equals(id)) {
-            throw new DadosInconsistentesException("ID do corpo e da URL não coincidem");
+        Lancamento lancamento = validarExistenciaLancamento(idLancamento);
+
+        Usuario usuario = lancamento.getUsuario();
+        Categoria categoria = lancamento.getCategoria();
+
+        if(!lancamentoAtualizado.idUsuario().equals(usuario.getId())) {
+             usuario = validarExistenciaUsuario(lancamentoAtualizado.idUsuario());
+        }
+        if(!lancamentoAtualizado.idCategoria().equals(categoria.getId())){
+             categoria = validarExistenciaCategoria(lancamentoAtualizado.idCategoria());
         }
 
-        validarExistenciaLancamento(id);
+        validarDuplicidade(idLancamento, lancamentoAtualizado.descricao(), lancamentoAtualizado.valor(), lancamentoAtualizado.data(), usuario);
 
-        validarExistenciaCategoria(lancamento.getCategoria().getId());
-
-        //validarDuplicidade(lancamento);
+        lancamento.atualizar(lancamentoAtualizado, usuario, categoria);
 
         return lancamentoRepository.save(lancamento);
     }
@@ -117,9 +121,9 @@ public class LancamentoService {
         return categoriaRepository.findById(id)
                 .orElseThrow(() -> new ObjetoNaoEncontradoException("Categoria não encontrada no sistema!"));
     }
-    private void validarExistenciaLancamento(Long id){
-        if (!lancamentoRepository.existsById(id))
-            throw new ObjetoNaoEncontradoException("Lancamento de id " + id + " não localizado no sistema!");
+    private Lancamento validarExistenciaLancamento(Long id){
+        return lancamentoRepository.findById(id)
+                .orElseThrow(() -> new ObjetoNaoEncontradoException("Lancamento de id " + id + " não localizado no sistema!"));
     }
     private List<Usuario> buscarUsuariosCompartilhados(Usuario usuario){
 

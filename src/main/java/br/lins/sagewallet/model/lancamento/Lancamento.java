@@ -51,6 +51,15 @@ public class Lancamento {
         this.usuario = usuario;
     }
 
+    public void atualizar(LancamentoRequestDTO lancamento, Usuario usuario, Categoria categoria){
+        this.descricao = lancamento.descricao();
+        this.data = lancamento.data();
+        this.valor = lancamento.valor();
+        this.categoria = categoria;
+        this.tipo = lancamento.tipo();
+        this.usuario = usuario;
+    }
+
     public Long getId() {
         return id;
     }

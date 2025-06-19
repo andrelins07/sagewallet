@@ -28,23 +28,24 @@ public class LancamentoController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Lancamento>> listar(){
-        return ResponseEntity.ok(lancamentoService.listar());
+    public ResponseEntity<List<LancamentoResponseDTO>> listar(){
+
+        return ResponseEntity.ok(lancamentoService.listar().stream().map(LancamentoResponseDTO::new).toList());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Lancamento> listarPorId(@PathVariable Long id) {
-        return ResponseEntity.ok(lancamentoService.listarPorId(id));
+    public ResponseEntity<LancamentoResponseDTO> listarPorId(@PathVariable Long id) {
+        return ResponseEntity.ok(new LancamentoResponseDTO(lancamentoService.listarPorId(id)));
     }
 
     @GetMapping("/usuario/{id}")
-    public ResponseEntity<List<Lancamento>> listarPorUsuario(@PathVariable Integer id) {
-        return ResponseEntity.ok(lancamentoService.listarPorUsuario(id));
+    public ResponseEntity<List<LancamentoResponseDTO>> listarPorUsuario(@PathVariable Integer id) {
+        return ResponseEntity.ok(lancamentoService.listarPorUsuario(id).stream().map(LancamentoResponseDTO::new).toList());
     }
 
     @GetMapping("/descricao/{descricao}")
-    public ResponseEntity<List<Lancamento>> listarPorDescricao(@PathVariable String descricao){
-        return ResponseEntity.ok(lancamentoService.listarPorDescricao(descricao));
+    public ResponseEntity<List<LancamentoResponseDTO>> listarPorDescricao(@PathVariable String descricao){
+        return ResponseEntity.ok(lancamentoService.listarPorDescricao(descricao).stream().map(LancamentoResponseDTO::new).toList());
     }
 
     @PostMapping
@@ -58,13 +59,13 @@ public class LancamentoController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Lancamento> atualizar(@Valid @RequestBody Lancamento lancamento, @PathVariable Long id) {
+    public ResponseEntity<LancamentoResponseDTO> atualizar(@Valid @RequestBody LancamentoRequestDTO lancamento, @PathVariable Long id) {
 
         Lancamento lancamentoAtualizado = lancamentoService.atualizar(lancamento, id);
 
-        webSocketIndicadoresController.carregarIndicadores(lancamento.getUsuario().getId());
+        webSocketIndicadoresController.carregarIndicadores(lancamentoAtualizado.getUsuario().getId());
 
-        return ResponseEntity.ok(lancamentoAtualizado);
+        return ResponseEntity.ok(new LancamentoResponseDTO(lancamentoAtualizado));
     }
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
