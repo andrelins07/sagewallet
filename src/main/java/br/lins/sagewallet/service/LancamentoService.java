@@ -1,10 +1,12 @@
 package br.lins.sagewallet.service;
 
+import br.lins.sagewallet.dto.LancamentoRequestDTO;
 import br.lins.sagewallet.exception.DadosInconsistentesException;
 import br.lins.sagewallet.exception.InformacoesDuplicadasException;
 import br.lins.sagewallet.exception.ObjetoNaoEncontradoException;
 import br.lins.sagewallet.model.compartilhamento.Compartilhamento;
 import br.lins.sagewallet.model.compartilhamento.EstadoSolicitacao;
+import br.lins.sagewallet.model.lancamento.Categoria;
 import br.lins.sagewallet.model.lancamento.Lancamento;
 import br.lins.sagewallet.model.usuario.Usuario;
 import br.lins.sagewallet.repository.CategoriaRepository;
@@ -12,6 +14,9 @@ import br.lins.sagewallet.repository.CompartilhamentoRepository;
 import br.lins.sagewallet.repository.LancamentoRepository;
 import br.lins.sagewallet.repository.UsuarioRepository;
 import org.springframework.stereotype.Service;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -61,19 +66,15 @@ public class LancamentoService {
         return lancamentoRepository.findByUsuarioIn(buscarUsuariosCompartilhados(usuario));
     }
 
-    public Lancamento criar(Lancamento lancamento) {
+    public Lancamento criar(LancamentoRequestDTO lancamento) {
 
-        validarExistenciaUsuario(lancamento.getUsuario().getId());
+        Usuario usuario = validarExistenciaUsuario(lancamento.idUsuario());
 
-        validarExistenciaCategoria(lancamento.getCategoria().getId());
+        Categoria categoria = validarExistenciaCategoria(lancamento.idCategoria());
 
-        if(lancamento.getId() != null){
-            throw new DadosInconsistentesException("O ID não pode ser diferente de nulo no metodo POST");
-        }
+        validarDuplicidade(null, lancamento.descricao(), lancamento.valor(), lancamento.data(), usuario);
 
-        validarDuplicidade(lancamento);
-
-        return lancamentoRepository.save(lancamento);
+        return lancamentoRepository.save(new Lancamento(lancamento, usuario, categoria));
     }
 
     public Lancamento atualizar(Lancamento lancamento, Long id) {
@@ -86,7 +87,7 @@ public class LancamentoService {
 
         validarExistenciaCategoria(lancamento.getCategoria().getId());
 
-        validarDuplicidade(lancamento);
+        //validarDuplicidade(lancamento);
 
         return lancamentoRepository.save(lancamento);
     }
@@ -98,26 +99,23 @@ public class LancamentoService {
         lancamentoRepository.deleteById(id);
     }
 
-    private void validarDuplicidade(Lancamento lancamento) {
+    private void validarDuplicidade(Long idLancamento, String descricao, BigDecimal valor, LocalDate data, Usuario usuario) {
 
          lancamentoRepository
-                .findByDescricaoAndValorAndDataAndUsuario(
-                        lancamento.getDescricao(),
-                        lancamento.getValor(),
-                        lancamento.getData(),
-                        lancamento.getUsuario()).ifPresent( l -> {
-             if (!Objects.equals(lancamento.getId(), l.getId())){
-                 throw new InformacoesDuplicadasException("Lancamento já cadastrado");
-             }
-         });
+                 .findByDescricaoAndValorAndDataAndUsuario(descricao, valor, data, usuario)
+                 .ifPresent( l -> {
+                     if (!Objects.equals(idLancamento, l.getId())){
+                         throw new InformacoesDuplicadasException("Lancamento já cadastrado");
+                     }
+                 });
     }
-    private void validarExistenciaUsuario(Integer id){
-        if(!usuarioRepository.existsById(id))
-            throw new ObjetoNaoEncontradoException("Usuario de id " + id + " não encontrado!");
+    private Usuario validarExistenciaUsuario(Integer id){
+        return usuarioRepository.findById(id)
+                .orElseThrow(() -> new ObjetoNaoEncontradoException("Usuario de id " + id + " não encontrado!"));
     }
-    private void validarExistenciaCategoria(Integer id){
-        if (!categoriaRepository.existsById(id))
-            throw new ObjetoNaoEncontradoException("Categoria não encontrada no sistema!");
+    private Categoria validarExistenciaCategoria(Integer id){
+        return categoriaRepository.findById(id)
+                .orElseThrow(() -> new ObjetoNaoEncontradoException("Categoria não encontrada no sistema!"));
     }
     private void validarExistenciaLancamento(Long id){
         if (!lancamentoRepository.existsById(id))

@@ -1,5 +1,6 @@
 package br.lins.sagewallet.model.lancamento;
 
+import br.lins.sagewallet.dto.LancamentoRequestDTO;
 import br.lins.sagewallet.model.usuario.Usuario;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
@@ -36,6 +37,19 @@ public class Lancamento {
     @NotNull
     @JoinColumn(name = "usuario_id", nullable = false)
     private Usuario usuario;
+
+    public Lancamento(){
+
+    }
+
+    public Lancamento(LancamentoRequestDTO lancamento, Usuario usuario, Categoria categoria){
+        this.descricao = lancamento.descricao();
+        this.data = lancamento.data();
+        this.valor = lancamento.valor();
+        this.categoria = categoria;
+        this.tipo = lancamento.tipo();
+        this.usuario = usuario;
+    }
 
     public Long getId() {
         return id;

@@ -1,6 +1,8 @@
 package br.lins.sagewallet.controller.rest;
 
 import br.lins.sagewallet.controller.webscoket.IndicadorWebSocketController;
+import br.lins.sagewallet.dto.LancamentoRequestDTO;
+import br.lins.sagewallet.dto.LancamentoResponseDTO;
 import br.lins.sagewallet.model.lancamento.Lancamento;
 import br.lins.sagewallet.service.LancamentoService;
 import jakarta.validation.Valid;
@@ -46,13 +48,13 @@ public class LancamentoController {
     }
 
     @PostMapping
-    public ResponseEntity<Lancamento> criar(@Valid @RequestBody Lancamento lancamento) {
+    public ResponseEntity<LancamentoResponseDTO> criar(@Valid @RequestBody LancamentoRequestDTO lancamento) {
 
-        Lancamento novo = lancamentoService.criar(lancamento);
+        Lancamento novoLancamentoo = lancamentoService.criar(lancamento);
 
-        webSocketIndicadoresController.carregarIndicadores(lancamento.getUsuario().getId());
+        webSocketIndicadoresController.carregarIndicadores(novoLancamentoo.getUsuario().getId());
 
-        return ResponseEntity.ok(novo);
+        return ResponseEntity.ok(new LancamentoResponseDTO(novoLancamentoo));
     }
 
     @PutMapping("/{id}")
