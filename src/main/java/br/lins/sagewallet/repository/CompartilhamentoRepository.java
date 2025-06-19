@@ -3,6 +3,7 @@ package br.lins.sagewallet.repository;
 import br.lins.sagewallet.model.usuario.Usuario;
 import br.lins.sagewallet.model.compartilhamento.Compartilhamento;
 import br.lins.sagewallet.model.compartilhamento.EstadoSolicitacao;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -11,6 +12,7 @@ import java.util.List;
 
 public interface CompartilhamentoRepository extends JpaRepository<Compartilhamento, Integer> {
 
+    @EntityGraph(attributePaths = {"destinatario", "remetente"})
     @Query("SELECT c FROM Compartilhamento c WHERE c.destinatario = :usuario AND c.status = :status")
     List<Compartilhamento> findByDestinatarioAndStatus(
             @Param("usuario") Usuario usuarioCompartilhado,
