@@ -36,7 +36,13 @@ public interface LancamentoRepository extends JpaRepository<Lancamento, Long> {
     """)
     List<Lancamento> findAllWithCategoriaAndUsuario();
 
-    List<Lancamento> findByUsuarioId(Integer id);
+    @Query("""
+        SELECT l FROM Lancamento l 
+        JOIN FETCH l.categoria 
+        JOIN FETCH l.usuario
+        WHERE l.usuario.id = :idUser
+    """)
+    List<Lancamento> findByUsuarioId(@Param("idUser") Integer id);
 
     Optional<Lancamento> findByDescricaoAndValorAndDataAndUsuario(String descricao, BigDecimal valor, LocalDate data, Usuario usuario);
 
