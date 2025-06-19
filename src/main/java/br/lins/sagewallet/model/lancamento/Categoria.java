@@ -17,36 +17,20 @@ public class Categoria {
     @NotBlank
     private String descricao;
 
+    public void atualizar(Categoria categoriaAtualziada) {
+        this.nome = categoriaAtualziada.getNome();
+        this.descricao = categoriaAtualziada.getDescricao();
+    }
+
     public Integer getId() {
         return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public String getDescricao() {
-        return descricao;
-    }
-
-    public void setDescricao(String descricao) {
-        this.descricao = descricao;
     }
 
     public String getNome() {
         return nome;
     }
 
-    public void setNome(String nome) {
-        this.nome = nome;
-    }
-
-    @Override
-    public String toString() {
-        return "Categoria{" +
-                "id=" + id +
-                ", nome='" + nome + '\'' +
-                ", descricao='" + descricao + '\'' +
-                '}';
+    public String getDescricao() {
+        return descricao;
     }
 }

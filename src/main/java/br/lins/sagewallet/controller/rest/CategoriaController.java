@@ -1,15 +1,12 @@
 package br.lins.sagewallet.controller.rest;
 
 import br.lins.sagewallet.model.lancamento.Categoria;
-import br.lins.sagewallet.repository.CategoriaRepository;
+import br.lins.sagewallet.service.CategoriaService;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/categorias")
@@ -17,50 +14,44 @@ import java.util.Optional;
 
 public class CategoriaController {
 
-    @Autowired
-    private CategoriaRepository categoriaRepository;
+    private final CategoriaService categoriaService;
+
+    public CategoriaController(CategoriaService categoriaService) {
+        this.categoriaService = categoriaService;
+    }
 
     @GetMapping
-    public ResponseEntity<List<Categoria>> getAllCategorias(){
-        return ResponseEntity.ok(categoriaRepository.findAll());
+    public ResponseEntity<List<Categoria>> listar(){
+        return ResponseEntity.ok(categoriaService.listar());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Categoria> getCategoriaById(@PathVariable Integer id){
-        return categoriaRepository.findById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
+    public ResponseEntity<Categoria> listarPorId(@PathVariable Integer id){
+        return ResponseEntity.ok(categoriaService.listarPorId(id));
     }
 
     @GetMapping("/descricao/{descricao}")
-    public ResponseEntity<List<Categoria>> getCategoriaByNome(@PathVariable String descricao){
-        return ResponseEntity.ok(categoriaRepository
-                .findAllByDescricaoContainingIgnoreCase(descricao));
+    public ResponseEntity<List<Categoria>> listarPorDescricao(@PathVariable String descricao){
+        return ResponseEntity.ok(categoriaService.listarPorDescricao(descricao));
     }
 
     @PostMapping
-    public ResponseEntity<Categoria> postCategoria(@Valid @RequestBody Categoria categoria){
-        return ResponseEntity.status(HttpStatus.CREATED)
-                .body(categoriaRepository.save(categoria));
-    }
+    public ResponseEntity<Categoria> cadastrar(@Valid @RequestBody Categoria categoria){
 
-    @PutMapping
-    public ResponseEntity<Categoria> putCategoria(@Valid @RequestBody Categoria categoria){
-        return categoriaRepository.findById(categoria.getId())
-                .map(resposta -> ResponseEntity.status(HttpStatus.CREATED)
-                        .body(categoriaRepository.save(categoria)))
-                .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
+        System.out.println("Nome: " + categoria.getNome() + "Descricao: " + categoria.getDescricao());
+
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(categoriaService.cadastrar(categoria));
+    }
+    @PutMapping("/{id}")
+    public ResponseEntity<Categoria> atualizar(@Valid @RequestBody Categoria categoria, @PathVariable Integer id){
+        return ResponseEntity.ok(categoriaService.atualizar(categoria, id));
     }
 
     @ResponseStatus(HttpStatus.NO_CONTENT)
     @DeleteMapping("/{id}")
-    public void deleteCategoria(@PathVariable Integer id) {
-        Optional<Categoria> categoria = categoriaRepository.findById(id);
-
-        if(categoria.isEmpty())
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND);
-
-        categoriaRepository.deleteById(id);
+    public void deletar(@PathVariable Integer id) {
+        categoriaService.deletar(id);
     }
 
 }
