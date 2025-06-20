@@ -1,5 +1,7 @@
 package br.lins.sagewallet.controller.rest;
 
+import br.lins.sagewallet.dto.CompartilhamentoRequestDTO;
+import br.lins.sagewallet.dto.CompartilhamentoResponseDTO;
 import br.lins.sagewallet.model.compartilhamento.Compartilhamento;
 import br.lins.sagewallet.model.compartilhamento.EstadoSolicitacao;
 import br.lins.sagewallet.service.CompartilhamentoService;
@@ -20,26 +22,26 @@ public class CompartilhamentoController {
     }
 
     @GetMapping
-    public ResponseEntity<List<Compartilhamento>> listar(){
-        return ResponseEntity.ok(compartilhamentoService.listarTodos());
+    public ResponseEntity<List<CompartilhamentoResponseDTO>> listar(){
+        return ResponseEntity.ok(compartilhamentoService.listarTodos().stream().map(CompartilhamentoResponseDTO::new).toList());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Compartilhamento> buscarPorId(@PathVariable Integer id) {
-        return ResponseEntity.ok(compartilhamentoService.listarPorId(id));
+    public ResponseEntity<CompartilhamentoResponseDTO> buscarPorId(@PathVariable Integer id) {
+        return ResponseEntity.ok(new CompartilhamentoResponseDTO(compartilhamentoService.listarPorId(id)));
     }
 
     @PostMapping
-    public ResponseEntity<Compartilhamento> criar(@RequestBody @Valid Compartilhamento compartilhamento){
+    public ResponseEntity<CompartilhamentoResponseDTO> criar(@RequestBody @Valid CompartilhamentoRequestDTO compartilhamento){
         return ResponseEntity.status(HttpStatus.CREATED).
-                body(compartilhamentoService.novaSolicitacao(compartilhamento));
+                body(new CompartilhamentoResponseDTO(compartilhamentoService.novaSolicitacao(compartilhamento)));
     }
 
     @PutMapping("/{id}/resposta")
-    public ResponseEntity<Compartilhamento> responderSolicitacao(
+    public ResponseEntity<CompartilhamentoResponseDTO> responderSolicitacao(
             @PathVariable Integer id,
             @RequestParam EstadoSolicitacao status) {
-        return ResponseEntity.ok(compartilhamentoService.responderSolicitacao(id, status));
+        return ResponseEntity.ok(new CompartilhamentoResponseDTO(compartilhamentoService.responderSolicitacao(id, status)));
     }
 
     @ResponseStatus(HttpStatus.NO_CONTENT)

@@ -1,6 +1,7 @@
 package br.lins.sagewallet.service;
 
 import br.lins.sagewallet.controller.webscoket.NotificacaoWebsocketController;
+import br.lins.sagewallet.dto.CompartilhamentoRequestDTO;
 import br.lins.sagewallet.exception.ObjetoNaoEncontradoException;
 import br.lins.sagewallet.model.compartilhamento.Compartilhamento;
 import br.lins.sagewallet.model.notificacao.Notificacao;
@@ -40,12 +41,12 @@ public class CompartilhamentoService {
                 orElseThrow(() -> new ObjetoNaoEncontradoException("Compartilhamento de ID " + id + " não foi localizado!"));
     }
 
-    public Compartilhamento novaSolicitacao(Compartilhamento compartilhamento) {
+    public Compartilhamento novaSolicitacao(CompartilhamentoRequestDTO compartilhamento) {
 
-        Usuario remetente = usuarioRepository.findById(compartilhamento.getRemetente().getId()).
+        Usuario remetente = usuarioRepository.findById(compartilhamento.idRemetente()).
                 orElseThrow(() -> new ObjetoNaoEncontradoException("Usuario remetente não foi encontrado!"));
 
-        Usuario destinatario = usuarioRepository.findById(compartilhamento.getDestinatario().getId()).
+        Usuario destinatario = usuarioRepository.findById(compartilhamento.idDestinatario()).
                 orElseThrow(() -> new ObjetoNaoEncontradoException("Usuario destinatario não foi encontrado!"));
 
         notificacaoWebsocketController.criarNotificacao(
@@ -53,7 +54,7 @@ public class CompartilhamentoService {
                         destinatario,
                         remetente.getNome() + " deseja compartilhar dados com você!"));
 
-        return compartilhamentoRepository.save(compartilhamento);
+        return compartilhamentoRepository.save(new Compartilhamento(remetente, destinatario));
     }
 
     public Compartilhamento responderSolicitacao(Integer id, EstadoSolicitacao resposta) {

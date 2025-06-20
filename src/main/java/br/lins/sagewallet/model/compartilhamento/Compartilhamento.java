@@ -30,16 +30,23 @@ public class Compartilhamento {
 
     private LocalDate dataSolicitacao;
 
-    public Compartilhamento() {
-        status = EstadoSolicitacao.PENDENTE;
-        dataSolicitacao = LocalDate.now();
+    public Compartilhamento(){
+
+    }
+
+    public Compartilhamento(Usuario remetente, Usuario destinatario) {
+        this.remetente = remetente;
+        this.destinatario = destinatario;
+        this.status = EstadoSolicitacao.PENDENTE;
+        this.dataSolicitacao = LocalDate.now();
     }
 
     public void responderSolicitacao(EstadoSolicitacao resposta) {
+
         this.status = resposta;
 
         if (resposta == EstadoSolicitacao.APROVADO){
-            this.dataSolicitacao = LocalDate.now();
+            this.dataCompartilhamento = LocalDate.now();
         }
     }
 
