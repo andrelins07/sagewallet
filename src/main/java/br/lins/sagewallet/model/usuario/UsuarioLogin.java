@@ -1,46 +1,24 @@
 package br.lins.sagewallet.model.usuario;
 
-import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.PositiveOrZero;
 import java.math.BigDecimal;
 
-@Entity
-@Table(name = "tb_usuarios")
-public class Usuario {
+public class UsuarioLogin {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @NotBlank
     private String nome;
 
-    @NotBlank
-    @Column(unique = true)
     private String nomeUsuario;
 
-    @NotBlank
-    @Column(unique = true)
     private String email;
 
-    @PositiveOrZero
+    private String senha;
+
     private BigDecimal salario;
 
-    @NotBlank
     private String ocupacao;
 
-    public Usuario() {
-    }
-
-    public Usuario(Integer id, String nome, String nomeUsuario, String email, BigDecimal salario, String ocupacao) {
-        this.id = id;
-        this.nome = nome;
-        this.nomeUsuario = nomeUsuario;
-        this.email = email;
-        this.salario = salario;
-        this.ocupacao = ocupacao;
-    }
+    private String token;
 
     public Integer getId() {
         return id;
@@ -74,6 +52,14 @@ public class Usuario {
         this.email = email;
     }
 
+    public String getSenha() {
+        return senha;
+    }
+
+    public void setSenha(String senha) {
+        this.senha = senha;
+    }
+
     public BigDecimal getSalario() {
         return salario;
     }
@@ -88,5 +74,13 @@ public class Usuario {
 
     public void setOcupacao(String ocupacao) {
         this.ocupacao = ocupacao;
+    }
+
+    public String getToken() {
+        return token;
+    }
+
+    public void setToken(String token) {
+        this.token = token;
     }
 }

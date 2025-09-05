@@ -1,0 +1,2 @@
+ALTER TABLE tb_usuarios
+ADD COLUMN senha VARCHAR(255);
