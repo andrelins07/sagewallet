@@ -30,6 +30,9 @@ public class Usuario {
     @NotBlank
     private String ocupacao;
 
+    @NotBlank
+    private String senha;
+
     public Usuario() {
     }
 
@@ -88,5 +91,13 @@ public class Usuario {
 
     public void setOcupacao(String ocupacao) {
         this.ocupacao = ocupacao;
+    }
+
+    public String getSenha() {
+        return senha;
+    }
+
+    public void setSenha(String senha) {
+        this.senha = senha;
     }
 }
